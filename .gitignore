@@ -1,3 +1,5 @@
+/node_modules
+/dest
 .idea
 *__gen.go
 *__ignore.go
@@ -11,3 +13,4 @@
 /tmp
 .git
 *.apk
+node_modules

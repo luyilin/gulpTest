@@ -4,10 +4,19 @@ var fs = require('fs');
 var ejs = require('gulp-ejs');
 var md5 = require('md5');
 var version = md5(new Date().getTime());
+var uglify = require('gulp-uglify');
+var less = require('gulp-less');
+var minifyCSS = require('gulp-clean-css');
 
 gulp.task('copy', function() {
-    gulp.src('./src/*.!html')
-        .pipe(gulp.dest('./dest/'))
+    gulp.src('./src/js/*')
+        .pipe(uglify())
+        .pipe(gulp.dest('./dest/js/'))
+        .pipe(connect.reload());
+    gulp.src('./src/css/*')
+        // .pipe(less())
+        .pipe(minifyCSS())
+        .pipe(gulp.dest('./dest/css/'))
         .pipe(connect.reload());
 });
 
@@ -24,18 +33,18 @@ gulp.task('readVersion', function () {
 });
 
 gulp.task('html', function () {
-   gulp.src('./src/*.html')
+   gulp.src('./src/tpl/*')
        .pipe(ejs({
            version: version
        }))
-       .pipe(gulp.dest('./dest/'))
-       // 导入ejs模板后再pipe到dest目录下,若copy task下也存在pipe html文件到dest目录,则可能覆盖此次pipe,因此copy task不要包括html文件
+       .pipe(gulp.dest('./dest/tpl'))
+       // 导入ejs模板后再pipe到dest目录下,若copy task下也存在pipe html文件到dest目录,则可能覆盖此次pipe,因此copy task里不要包括html文件
        .pipe(connect.reload());
 });
 
 gulp.task('watch', function () {
-    gulp.watch(['./src/*'], ['copy']);
-    gulp.watch(['./src/*.html', './src/*.ejs'], ['html']);
+    gulp.watch(['./src/js/*', './src/css/*'], ['copy']);
+    gulp.watch(['./src/tpl/*', './src/ejs/*'], ['html']);
 });
 
 gulp.task('default', ['readVersion'], function () {
